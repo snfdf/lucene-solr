@@ -115,6 +115,11 @@ public class Facet2DStream extends TupleStream implements Expressible {
         params.add(namedParam.getName(), namedParam.getParameter().toString().trim());
       }
     }
+
+    if(params.get("q") == null) {
+      params.set("q", "*:*");
+    }
+
     Bucket x = null;
     if (bucketXExpression != null) {
       if (bucketXExpression.getParameter() instanceof StreamExpressionValue) {
@@ -148,8 +153,8 @@ public class Facet2DStream extends TupleStream implements Expressible {
     String bucketSortString = metric.getIdentifier() + " desc";
     FieldComparator bucketSort = parseBucketSort(bucketSortString, x, y);
 
-    int dimensionX = 0;
-    int dimensionY = 0;
+    int dimensionX = 10;
+    int dimensionY = 10;
     if (dimensionsExpression != null) {
       if (dimensionsExpression.getParameter() instanceof StreamExpressionValue) {
         String[] strDimensions = ((StreamExpressionValue) dimensionsExpression.getParameter()).getValue().split(",");
@@ -350,16 +355,16 @@ public class Facet2DStream extends TupleStream implements Expressible {
     buf.append('"');
     buf.append(":{");
     buf.append("\"type\":\"terms\"");
-    buf.append(",\"field\":\"" + x.toString() + "\"");
-    buf.append(",\"limit\":" + dimensionX );
+    buf.append(",\"field\":\"").append(x.toString()).append('"');
+    buf.append(",\"limit\":").append(dimensionX);
     buf.append(",\"overrequest\":1000");
     String fsort = getFacetSort(adjustedSorts[0].getLeftFieldName(), metric);
-    buf.append(",\"sort\":\""+ fsort + " desc\"");
+    buf.append(",\"sort\":\"").append(fsort).append(" desc\"");
     buf.append(",\"facet\":{");
 
     String identifier = metric.getIdentifier();
     if (!identifier.startsWith("count(")) {
-      buf.append("\"agg\":\"" + identifier + "\"");
+      buf.append("\"agg\":\"").append(identifier).append('"');
       buf.append(",");
     }
     buf.append('"');
@@ -367,14 +372,14 @@ public class Facet2DStream extends TupleStream implements Expressible {
     buf.append('"');
     buf.append(":{");
     buf.append("\"type\":\"terms\"");
-    buf.append(",\"field\":\"" + y.toString() + "\"");
-    buf.append(",\"limit\":" + dimensionY );
+    buf.append(",\"field\":\"").append(y.toString()).append('"');
+    buf.append(",\"limit\":").append(dimensionY);
     buf.append(",\"overrequest\":1000");
     String fsortY = getFacetSort(adjustedSorts[1].getLeftFieldName(), metric);
-    buf.append(",\"sort\":\""+ fsortY + " desc\"");
+    buf.append(",\"sort\":\"").append(fsortY).append(" desc\"");
     buf.append(",\"facet\":{");
     if (!identifier.startsWith("count(")) {
-      buf.append("\"agg\":\"" + identifier + "\"");
+      buf.append("\"agg\":\"").append(identifier).append('"');
     }
     buf.append("}}}}");
   }
